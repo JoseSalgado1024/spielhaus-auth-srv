@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const verifyJWTmiddleware = require("../Middleware/authorizationJWT");
 const authViews = require("../Views/authorization");
-const User = require("../models/user");
+const User = require("../Models/user");
 
 // SingUp
 router.post( "/singUp", authViews.singUp );

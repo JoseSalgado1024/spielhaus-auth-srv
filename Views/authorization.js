@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const SingUpForm = require("../Forms/singup");
 const LoginForm = require("../Forms/login");
 const PermissionForms = require("../Forms/permission");
-const User = require("../models/user");
-const Permission = require("../models/permissions");
+const User = require("../Models/user");
+const Permission = require("../Models/permissions");
 
 
 module.exports.login = async ( request, response ) => {

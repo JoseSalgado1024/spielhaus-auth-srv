@@ -1,5 +1,5 @@
 const PermissionForms = require("../Forms/permission");
-const Permission = require("../models/permissions");
+const Permission = require("../Models/permissions");
 
 
 function serializePermission( _perm ){
