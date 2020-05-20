@@ -226,13 +226,13 @@ module.exports.grantPermission = async ( request, response ) => {
 
 // Revoke Permission APIView
 module.exports.revokePermission = async ( request, response ) => {
+
     const { success, errors } = PermissionForms.GrantRevokePermission( request.params );
     if (!success) return response.status( 400 ).send({
         sucess: false, 
         status: 400,
         errors: errors
     });
-
     var _usr = await User.findOne({ email: request.params.user_id }, ( err ) => {
         if ( err ) return response.status( 404 ).send({
             status: 404,
@@ -247,7 +247,6 @@ module.exports.revokePermission = async ( request, response ) => {
             errors:[{message: "Permission #ID:" + request.params.permission_id + " not found."}]
         });
     });
-
     let _perm_as_claim = _perm.namespace + ":" + _perm.action;
     if (_usr.permissions.includes( _perm_as_claim)) {
         try {
@@ -271,6 +270,7 @@ module.exports.revokePermission = async ( request, response ) => {
             }
         });
     }
+    
     return response.status( 400 ).send({
         status: 400,
         errors: [
