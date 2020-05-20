@@ -1,6 +1,6 @@
 const Joi = require("@hapi/joi");
 
-const validLogin = ( data ) => {
+const LoginForm = ( data ) => {
 
     const loginSchema = Joi.object({
     
@@ -16,4 +16,4 @@ const validLogin = ( data ) => {
     return { success: true, errors: null };
 };
 
-module.exports = validLogin;
+module.exports = LoginForm;
