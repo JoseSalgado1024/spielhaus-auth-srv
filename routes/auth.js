@@ -4,7 +4,6 @@ const verifyJWTmiddleware = require("../middleware/authorizationJWT");
 const authViews = require("../Views/authorization");
 const User = require("../models/user");
 
-// http://localhost:3000/api/users/jose.salgado.wrk@gmail.com/5ec497de3e9a8b4a449dd2b9/
 // SingUp
 router.post( "/singUp", authViews.singUp );
 // Login
