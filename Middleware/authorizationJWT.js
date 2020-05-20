@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 
+
+// Validate User credentials middleware
 module.exports = function ( request, response, next ) {
     const token = request.header("Authorization");
     if (!token) return response.status( 401 ).send({

@@ -18,6 +18,7 @@ mongoose.connect(
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
+// Service Routes
 app.use("/api/users", authRouter);
 app.use("/api/permissions", permissionRouter);
 
