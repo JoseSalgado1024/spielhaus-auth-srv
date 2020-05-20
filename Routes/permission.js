@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const verifyJWT = require("../middleware/authorizationJWT");
+const verifyJWT = require("../Middleware/authorizationJWT");
 const permissionViews = require("../Views/permission");
 
 

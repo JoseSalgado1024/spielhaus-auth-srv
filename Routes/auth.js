@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const verifyJWTmiddleware = require("../middleware/authorizationJWT");
+const verifyJWTmiddleware = require("../Middleware/authorizationJWT");
 const authViews = require("../Views/authorization");
 const User = require("../models/user");
 
