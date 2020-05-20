@@ -1,7 +1,7 @@
 {
   "name": "spielhaus-auth-srv",
   "version": "1.0.0",
-  "description": "",
+  "description": "Spielhaus Auth Provider",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
