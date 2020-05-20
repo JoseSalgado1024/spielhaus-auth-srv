@@ -90,7 +90,7 @@ module.exports.deletePermission = async ( request, response ) => {
             return response.status( 200 ).send({
                 sucess: true,
                 status: 200,
-                data: { message: "Permission " + d.namespace+ ":"+ d.action + " was successfully deleted" }
+                data: null
             })
         });
 };
