@@ -2,7 +2,8 @@ const PermissionForms = require("../Forms/permission");
 const Permission = require("../Models/permissions");
 
 
-function serializePermission( _perm ){
+function serializePermission( _perm ) {
+    
     return { 
         namespace: _perm.namespace,
         description: _perm.description,
@@ -12,6 +13,7 @@ function serializePermission( _perm ){
         created_at: _perm.created_at
     }
 }
+
 
 module.exports.getPermission = async ( request, response ) => {
     
@@ -24,6 +26,7 @@ module.exports.getPermission = async ( request, response ) => {
 
 };
 
+
 module.exports.createPermission = async ( request, response ) => {
     
     const { success, errors } = PermissionForms.createPermission(request.body);
@@ -32,12 +35,10 @@ module.exports.createPermission = async ( request, response ) => {
         status: 400,
         errors: errors
     });
-
     const permAlreadyExists = await Permission.findOne({ 
             namespace: request.body.namespace,
             action: request.body.action
         });
-
     if (permAlreadyExists) {
         return response.status( 403 ).send({
                 status: 403,
@@ -45,13 +46,11 @@ module.exports.createPermission = async ( request, response ) => {
                 errors: [{ message: "Permission already exists" }]
             });
     };
-
     const perm = new Permission({
         namespace: request.body.namespace,
         action: request.body.action,
         description: request.body.description? request.body.description: ""
     });
-
     try {
         const _saved_perm = await perm.save();
         return response.status( 201 ).send({
@@ -70,6 +69,7 @@ module.exports.createPermission = async ( request, response ) => {
     };
 };
 
+
 module.exports.deletePermission = async ( request, response ) => {
     
     const { success, errors } = PermissionForms.SelectPermission( request.body );
@@ -78,7 +78,6 @@ module.exports.deletePermission = async ( request, response ) => {
         status: 400,
         errors: errors
     });
-
     const d = await Permission.deleteOne({ 
             _id: request.body.id
         }, ( deleteError ) => {
