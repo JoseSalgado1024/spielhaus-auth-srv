@@ -156,9 +156,11 @@ module.exports.userPermissions = async ( request, response ) => {
             success: true,
             status: 200,
             data: {
-                user: _u.id,
-                email: _u.email,
-                permissions: _u.permissions
+                user: {
+                    id: _u.id,
+                    email: _u.email,
+                    permissions: _u.permissions
+                }
             }
         }
     );
@@ -194,13 +196,7 @@ module.exports.grantPermission = async ( request, response ) => {
         try {
         _usr.permissions.push(_perm_as_claim);
         await _usr.save();
-        return response.status( 201 ).send({
-            status: 201,
-            success: true,
-            data: {
-                user: _usr
-            }
-        });} catch {
+        } catch {
             return response.status( 400 ).send({
                 success: false,
                 status: 400,
@@ -212,16 +208,75 @@ module.exports.grantPermission = async ( request, response ) => {
         success: true,
         status: 200,
         data: {
-            id: _usr._id,
-            email: _usr.email,
-            permissions: _usr.permissions
-        },
-        warning: "User has already permission <" +  _perm_as_claim + ">"
+            user: {
+                id: _usr._id,
+                email: _usr.email,
+                permissions: _usr.permissions
+            },
+            gratedPermission: {
+                claim: _perm_as_claim,
+                permission_id: _perm._id,
+                namespace: _perm.namespace,
+                action: _perm.action
+            }
+        }
     });
 };
 
 
 // Revoke Permission APIView
 module.exports.revokePermission = async ( request, response ) => {
+    const { success, errors } = PermissionForms.GrantRevokePermission( request.params );
+    if (!success) return response.status( 400 ).send({
+        sucess: false, 
+        status: 400,
+        errors: errors
+    });
 
+    var _usr = await User.findOne({ email: request.params.user_id }, ( err ) => {
+        if ( err ) return response.status( 404 ).send({
+            status: 404,
+            success: false, 
+            errors:[{ message: "User #ID:" + request.params.user_id + " not found." }]
+        });
+    });
+    const _perm = await Permission.findOne({ _id: request.params.permission_id }, ( err ) => {
+        if ( err ) return response.status( 404 ).send({
+            status: 404,
+            success: false, 
+            errors:[{message: "Permission #ID:" + request.params.permission_id + " not found."}]
+        });
+    });
+
+    let _perm_as_claim = _perm.namespace + ":" + _perm.action;
+    if (_usr.permissions.includes( _perm_as_claim)) {
+        try {
+            _usr.permissions.pop( _perm_as_claim );
+            await _usr.save();
+        } catch {
+            return response.status( 400 ).send();
+        };
+        return response.status( 200 ).send({
+            data: {
+                user: {
+                    id: _usr._id,
+                    email: _usr.email,
+                    permissions: _usr.permissions
+                },
+                revokedPermission: {
+                    claim: _perm_as_claim},
+                    permission_id: _perm._id,
+                    namespace: _perm.namespace,
+                    action: _perm.action
+            }
+        });
+    }
+    return response.status( 400 ).send({
+        status: 400,
+        errors: [
+            {
+                message: "User <ID:" + _usr.id + "> " +
+                         "has not permission <ID:" + _perm_as_claim + ">"
+            }]
+    });
 } 
