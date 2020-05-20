@@ -17,8 +17,8 @@ mongoose.connect(
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
-app.use("/api/user", authRouter);
-app.use("/api/permission", permissionRouter);
+app.use("/api/users", authRouter);
+app.use("/api/permissions", permissionRouter);
 
 // Run server
 app.listen(3000, () => 

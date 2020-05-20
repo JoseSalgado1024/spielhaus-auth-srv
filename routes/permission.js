@@ -1,6 +1,9 @@
 const router = require("express").Router();
+
 const verifyJWT = require("../middleware/authorizationJWT");
-const permissionViews = require("../views/permission");
+const permissionViews = require("../Views/permission");
+
+
 // List permissions
 router.get( "/", verifyJWT, permissionViews.getPermission );
 // Delete Permission

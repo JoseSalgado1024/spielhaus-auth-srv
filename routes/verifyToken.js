@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+
 module.exports = function ( request, response, next ) {
     const token = request.header("Authorization");
     if (!token) return response.status( 401 ).send({

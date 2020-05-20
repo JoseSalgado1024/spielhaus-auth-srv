@@ -14,6 +14,13 @@ const selectPermissionSchema = Joi.object({
 
 });
 
+const GrantRevokePermissionSchema = Joi.object({
+
+    user_id: Joi.string().email().min(4).max(256).required(),
+    permission_id: Joi.string().alphanum().min(4).max(256).required()
+});
+
+
 module.exports.createPermission = function ( data ) {
 
     const { error } = createPermissionSchema.validate( data );
@@ -29,3 +36,9 @@ module.exports.SelectPermission = function ( data ) {
     return { success: true, errors: null };
 
 }
+
+module.exports.GrantRevokePermission = function ( data ) {
+    const { error } = GrantRevokePermissionSchema.validate( data );
+    if ( error ) return {success: false, errors: error.details  };
+    return { success: true, errors: null };
+};

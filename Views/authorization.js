@@ -1,13 +1,16 @@
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
-const validRegister = require("../validations/singup");
-const validLogin = require("../validations/login");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+const SingUpForm = require("../Forms/singup");
+const LoginForm = require("../Forms/login");
+const PermissionForms = require("../Forms/permission");
+const User = require("../models/user");
+const Permission = require("../models/permissions");
 
 
 module.exports.login = async ( request, response ) => {
     
-    const { success, errors } = validLogin(request.body);
+    const { success, errors } = LoginForm(request.body);
     if (!success) return response.status( 400 ).send({
         sucess: false, 
         status: 400,
@@ -69,7 +72,7 @@ module.exports.login = async ( request, response ) => {
 
 module.exports.singUp = async (request, response) => {
     
-    const { success, errors } = validRegister(request.body);
+    const { success, errors } = SingUpForm(request.body);
 
     if ( !success ) return response.status( 400 ).send({ errors: errors, sucess: success});
     
@@ -120,7 +123,6 @@ module.exports.singUp = async (request, response) => {
         });
         console.log( err );
     }
-    
 }
 
 module.exports.verifyJWToken = ( request, response ) => {
@@ -130,7 +132,7 @@ module.exports.verifyJWToken = ( request, response ) => {
         success: true
     })};
 
-module.exports.userInfo = ( request, response ) => {
+module.exports.userInfo = async ( request, response ) => {
     response.header("Authentication", "Bearer " + request.user.token);
     return response.status( 200 ).send({
         status: 200,
@@ -138,3 +140,68 @@ module.exports.userInfo = ( request, response ) => {
         data: request.user
     });
 }
+
+module.exports.userPermissions = async ( request, response ) => {
+    const _u = await User.findOne({ email: request.params.user_id }, ( selectionErr ) => {
+        if ( selectionErr ) {
+            return response.status( 404 ).send({
+                success: false,
+                errors: selectionErr,
+                status: 400
+            })
+        }
+    }); 
+    response.status( 200 ).send(
+        {
+            success: true,
+            status: 200,
+            data: {
+                user: _u.id,
+                email: _u.email,
+                permissions: _u.permissions
+            }
+        }
+    );
+};
+
+module.exports.grantPermission = async ( request, response ) => {
+    const { success, errors } = PermissionForms.GrantRevokePermission( request.params );
+    if (!success) return response.status( 400 ).send({
+        sucess: false, 
+        status: 400,
+        errors: errors
+    });
+
+    var _usr = await User.findOne({ email: request.params.user_id });
+    const _perm = await Permission.findOne({ _id: request.params.permission_id });
+    
+    if ( !_usr || !_perm ) return response.status( 404 ).send({
+        status: 404,
+        success: false, 
+        errors:[{message: "Object not found"}]
+    });
+
+    let _perm_as_claim = _perm.namespace + ":" + _perm.action;
+    if ( !_usr.permissions.includes( _perm_as_claim ) ) {
+        try {
+        _usr.permissions.push(_perm_as_claim);
+        await _usr.save();
+        return response.status( 201 ).send({
+            status: 201,
+            success: true,
+            data: {
+                user: _usr
+            }
+        });} catch {
+            return response.status( 400 ).send({
+                success: false,
+                status: 400,
+                errors: [{ message: err }]
+            });
+        };        
+    };
+};
+
+module.exports.revokePermission = async ( request, response ) => {
+
+} 
