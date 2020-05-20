@@ -18,4 +18,6 @@ router.get( "/:user_id/permissions", verifyJWTmiddleware, authViews.userPermissi
 router.post( "/:user_id/permissions/:permission_id", verifyJWTmiddleware, authViews.grantPermission );
 // Revoke permission
 router.delete( "/:user_id/permissions/:permission_id/", verifyJWTmiddleware, authViews.revokePermission );
+
+
 module.exports = router;

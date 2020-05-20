@@ -8,25 +8,21 @@ const User = require("../Models/user");
 const Permission = require("../Models/permissions");
 
 
+// Login APIView
 module.exports.login = async ( request, response ) => {
-    
     const { success, errors } = LoginForm(request.body);
     if (!success) return response.status( 400 ).send({
         sucess: false, 
         status: 400,
         errors: errors
     });
-    
     const userExists = await User.findOne( { email: request.body.email } );
-    // console.log(userExists.collation.email);
     if (!userExists) return response.status( 404 ).send({
         sucess: false,
         status: 404,
         errors:[{ message: "User or password is wrong" }]
     });
-
     const validPassword = await bcrypt.compare( request.body.password, userExists.password );
-
     if ( !validPassword ) return response.status( 404 ).send({
         sucess: false,
         status: 404,
@@ -34,16 +30,12 @@ module.exports.login = async ( request, response ) => {
             message: "Email or password is wrong",
         }]
     });
-
-    const token = await jwt.sign(
-        
-        {
+    const token = await jwt.sign({
             _id: userExists._id,
             permission: userExists.permissions,
             email: userExists.email,
             username: userExists.name
-        }, 
-
+        },
         process.env.TOKEN_SECRET,
         {
             algorithm: process.env.TOKEN_ALGORITHM,
@@ -70,6 +62,8 @@ module.exports.login = async ( request, response ) => {
     );
 }
 
+
+// SingUp APIView
 module.exports.singUp = async (request, response) => {
     
     const { success, errors } = SingUpForm(request.body);
@@ -125,6 +119,8 @@ module.exports.singUp = async (request, response) => {
     }
 }
 
+
+// Verify Token APIView
 module.exports.verifyJWToken = ( request, response ) => {
     response.status( 200 ).send({
         status: 200,
@@ -132,6 +128,8 @@ module.exports.verifyJWToken = ( request, response ) => {
         success: true
     })};
 
+
+// User Info APIView
 module.exports.userInfo = async ( request, response ) => {
     response.header("Authentication", "Bearer " + request.user.token);
     return response.status( 200 ).send({
@@ -141,6 +139,8 @@ module.exports.userInfo = async ( request, response ) => {
     });
 }
 
+
+// Get User permission APIView
 module.exports.userPermissions = async ( request, response ) => {
     const _u = await User.findOne({ email: request.params.user_id }, ( selectionErr ) => {
         if ( selectionErr ) {
@@ -164,6 +164,8 @@ module.exports.userPermissions = async ( request, response ) => {
     );
 };
 
+
+// Grant Permission APIView
 module.exports.grantPermission = async ( request, response ) => {
     const { success, errors } = PermissionForms.GrantRevokePermission( request.params );
     if (!success) return response.status( 400 ).send({
@@ -218,6 +220,8 @@ module.exports.grantPermission = async ( request, response ) => {
     });
 };
 
+
+// Revoke Permission APIView
 module.exports.revokePermission = async ( request, response ) => {
 
 } 

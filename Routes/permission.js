@@ -11,4 +11,5 @@ router.post( "/delete", verifyJWT, permissionViews.deletePermission );
 // Create Premission
 router.post( "/create", verifyJWT, permissionViews.createPermission );
 
+
 module.exports = router;
