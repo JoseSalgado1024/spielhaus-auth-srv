@@ -172,13 +172,19 @@ module.exports.grantPermission = async ( request, response ) => {
         errors: errors
     });
 
-    var _usr = await User.findOne({ email: request.params.user_id });
-    const _perm = await Permission.findOne({ _id: request.params.permission_id });
-    
-    if ( !_usr || !_perm ) return response.status( 404 ).send({
-        status: 404,
-        success: false, 
-        errors:[{message: "Object not found"}]
+    var _usr = await User.findOne({ email: request.params.user_id }, ( err ) => {
+        if ( err ) return response.status( 404 ).send({
+            status: 404,
+            success: false, 
+            errors:[{ message: "User #ID:" + request.params.user_id + " not found." }]
+        });
+    });
+    const _perm = await Permission.findOne({ _id: request.params.permission_id }, ( err ) => {
+        if ( err ) return response.status( 404 ).send({
+            status: 404,
+            success: false, 
+            errors:[{message: "Permission #ID:" + request.params.permission_id + " not found."}]
+        });
     });
 
     let _perm_as_claim = _perm.namespace + ":" + _perm.action;
@@ -200,6 +206,16 @@ module.exports.grantPermission = async ( request, response ) => {
             });
         };        
     };
+    return response.status( 200 ).send({
+        success: true,
+        status: 200,
+        data: {
+            id: _usr._id,
+            email: _usr.email,
+            permissions: _usr.permissions
+        },
+        warning: "User has already permission <" +  _perm_as_claim + ">"
+    });
 };
 
 module.exports.revokePermission = async ( request, response ) => {
