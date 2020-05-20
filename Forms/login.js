@@ -1,13 +1,16 @@
 const Joi = require("@hapi/joi");
 
-const LoginForm = ( data ) => {
 
-    const loginSchema = Joi.object({
+const loginSchema = Joi.object({
     
         email: Joi.string().email().min(5).max(50).required(),
         password: Joi.string().min(10).max(1024).required(),
     
-    })
+    });
+
+
+const LoginForm = ( data ) => {
+
     
     const { error } = loginSchema.validate( data );
     
